@@ -11,6 +11,8 @@
 		9038A77727AF630400D56E43 /* UserProfile.graphql in Resources */ = {isa = PBXBuildFile; fileRef = 9038A77627AF630400D56E43 /* UserProfile.graphql */; };
 		9038A77B27AF685A00D56E43 /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9038A77A27AF685A00D56E43 /* API.swift */; };
 		9038A77D27AF686500D56E43 /* GraphQLNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9038A77C27AF686500D56E43 /* GraphQLNetwork.swift */; };
+		9038A78027AF6AC000D56E43 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9038A77F27AF6AC000D56E43 /* SnapKit */; };
+		9038A78327AF6D9B00D56E43 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 9038A78227AF6D9B00D56E43 /* Kingfisher */; };
 		907D861127AF47C90099C403 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 907D861027AF47C90099C403 /* AppDelegate.swift */; };
 		907D861327AF47C90099C403 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 907D861227AF47C90099C403 /* SceneDelegate.swift */; };
 		907D861527AF47C90099C403 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 907D861427AF47C90099C403 /* ViewController.swift */; };
@@ -48,6 +50,8 @@
 				907D862C27AF58270099C403 /* ApolloAPI in Frameworks */,
 				907D863427AF58270099C403 /* ApolloWebSocket in Frameworks */,
 				907D863227AF58270099C403 /* ApolloUtils in Frameworks */,
+				9038A78027AF6AC000D56E43 /* SnapKit in Frameworks */,
+				9038A78327AF6D9B00D56E43 /* Kingfisher in Frameworks */,
 				907D863027AF58270099C403 /* ApolloSQLite in Frameworks */,
 				907D862E27AF58270099C403 /* ApolloCodegenLib in Frameworks */,
 				907D862A27AF58270099C403 /* Apollo in Frameworks */,
@@ -123,6 +127,8 @@
 				907D862F27AF58270099C403 /* ApolloSQLite */,
 				907D863127AF58270099C403 /* ApolloUtils */,
 				907D863327AF58270099C403 /* ApolloWebSocket */,
+				9038A77F27AF6AC000D56E43 /* SnapKit */,
+				9038A78227AF6D9B00D56E43 /* Kingfisher */,
 			);
 			productName = GithubProfile_GraphQL_Apollo_UIKit;
 			productReference = 907D860D27AF47C90099C403 /* GithubProfile_GraphQL_Apollo_UIKit.app */;
@@ -154,6 +160,8 @@
 			mainGroup = 907D860427AF47C90099C403;
 			packageReferences = (
 				907D862827AF58270099C403 /* XCRemoteSwiftPackageReference "apollo-ios" */,
+				9038A77E27AF6ABF00D56E43 /* XCRemoteSwiftPackageReference "SnapKit" */,
+				9038A78127AF6D9B00D56E43 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 			);
 			productRefGroup = 907D860E27AF47C90099C403 /* Products */;
 			projectDirPath = "";
@@ -421,6 +429,22 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		9038A77E27AF6ABF00D56E43 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+		9038A78127AF6D9B00D56E43 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.0.0;
+			};
+		};
 		907D862827AF58270099C403 /* XCRemoteSwiftPackageReference "apollo-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apollographql/apollo-ios";
@@ -432,6 +456,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		9038A77F27AF6AC000D56E43 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9038A77E27AF6ABF00D56E43 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+		9038A78227AF6D9B00D56E43 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9038A78127AF6D9B00D56E43 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
 		907D862927AF58270099C403 /* Apollo */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 907D862827AF58270099C403 /* XCRemoteSwiftPackageReference "apollo-ios" */;
