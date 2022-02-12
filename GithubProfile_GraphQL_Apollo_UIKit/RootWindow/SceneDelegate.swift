@@ -6,20 +6,24 @@
 //
 
 import UIKit
+import Firebase
+import RxSwift
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
-    var window: RootWindow?
-
+    var rootWindow: RootWindow?
+    var rootWindowViewModel: RootWindowViewModel?
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
+        FirebaseApp.configure()
         guard let scene = (scene as? UIWindowScene) else { return }
-        
-        self.window = RootWindow(windowScene: scene)
-        self.window?.setViewController()
+     
+        let viewModel = RootWindowViewModel()
+        self.rootWindowViewModel = viewModel
+        self.rootWindow = RootWindow(viewModel: viewModel, windowScene: scene)
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -32,11 +36,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneDidBecomeActive(_ scene: UIScene) {
         // Called when the scene has moved from an inactive state to an active state.
         // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
+        rootWindowViewModel?.becomeActive.accept(Date())
     }
 
     func sceneWillResignActive(_ scene: UIScene) {
         // Called when the scene will move from an active state to an inactive state.
         // This may occur due to temporary interruptions (ex. an incoming phone call).
+        rootWindowViewModel?.becomeInActive.accept(Date())
     }
 
     func sceneWillEnterForeground(_ scene: UIScene) {
