@@ -9,16 +9,19 @@ import Foundation
 import RxCocoa
 import RxSwift
 
+struct Item: Hashable {
+    let uuid = UUID()
+    var text: String
+}
+
 final class InfiniteTableViewModel: InfiniteTableViewModelBindable {
     // input
     let viewDidLoad = PublishRelay<Void>()
     let loadMoreData = PublishRelay<LastRowIndex>()
     
     // output
-    let reloadTableView: Driver<[String]>
+    let reloadTableView: Driver<[Item]>
     let shouldShowLoadView: Driver<Bool>
-    
-    static let tableViewInitialDataSource: [String] = ["AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA"]
     
     init() {
         let loadMoreWhenDistinct = loadMoreData
@@ -41,7 +44,9 @@ final class InfiniteTableViewModel: InfiniteTableViewModelBindable {
             .asDriver(onErrorJustReturn: true)
         
         self.reloadTableView = loadedSignal
-            .map { _ in Self.tableViewInitialDataSource }
+            .map { _ in
+                return [Item(text: "AAA"),Item(text: "AAA"),Item(text: "AAA"),Item(text: "AAA"),Item(text: "AAA"),Item(text: "AAA"),Item(text: "AAA"),Item(text: "AAA"),Item(text: "AAA"),Item(text: "AAA"),Item(text: "AAA"),Item(text: "AAA"),Item(text: "AAA"),Item(text: "AAA"),Item(text: "AAA"),Item(text: "AAA"),Item(text: "AAA"),Item(text: "AAA"),Item(text: "AAA"),Item(text: "AAA")]
+            }
             .asDriver(onErrorJustReturn: [])
     }
 }
