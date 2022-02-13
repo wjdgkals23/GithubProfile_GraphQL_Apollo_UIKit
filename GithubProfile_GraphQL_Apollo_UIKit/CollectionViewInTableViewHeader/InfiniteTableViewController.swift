@@ -13,12 +13,15 @@ import SnapKit
 
 // STEP1. TableView에 String Data 40개를 뿌린다. <DONE>
 // STEP2. TableView에 마지막에 닿았을 때, 데이터를 추가생성하는 시그널을 호출한다. <DONE>
-// STEP3. TableView에 마지막에 닿았을 때, 나타나는 로더뷰를 생성한다. <DONE> => Footer로 넣기 (Footer로 지정할 경우 높이를 컨트롤하는 것이 불가)
+// STEP3. TableView에 마지막에 닿았을 때, 나타나는 로더뷰를 생성한다. <DONE>
+// STEP4. Footer로 넣기 (Footer로 지정할 경우 높이를 컨트롤하는 것이 불가) <DONE>
+// STEP5. 위로 올라갔다가, 다시 내려왔을 때 현재 data가 돌고 있다면, skip되어야한다. <DONE>
 
+typealias LastRowIndex = Int
 protocol InfiniteTableViewModelBindable {
     // input
     var viewDidLoad: PublishRelay<Void> { get }
-    var loadMoreData: PublishRelay<Void> { get }
+    var loadMoreData: PublishRelay<LastRowIndex> { get }
     // output
     var reloadTableView: Driver<[String]> { get }
     var shouldShowLoadView: Driver<Bool> { get }
@@ -28,7 +31,6 @@ final class InfiniteTableViewController: UIViewController {
     let tableView = UITableView()
     let loaderView = UIView()
     lazy var loader = UIActivityIndicatorView()
-    var loaderViewHeightConstraint: Constraint?
 
     let disposeBag = DisposeBag()
 
@@ -59,17 +61,11 @@ final class InfiniteTableViewController: UIViewController {
     override func viewDidLoad() {
         view.addSubview(tableView)
         tableView.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview()
+            $0.top.leading.trailing.bottom.equalToSuperview()
         }
     
-        view.addSubview(loaderView)
-        
         loaderView.backgroundColor = .white
-        loaderView.snp.makeConstraints { [weak self] snp in
-            snp.top.equalTo(tableView.snp.bottom)
-            snp.leading.trailing.bottom.equalToSuperview()
-            self?.loaderViewHeightConstraint = snp.height.equalTo(0).constraint
-        }
+        loaderView.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 50)
         
         loaderView.addSubview(loader)
         loader.snp.makeConstraints {
@@ -97,10 +93,10 @@ extension Reactive where Base: InfiniteTableViewController {
             UIView.animate(withDuration: 0.3) { [weak base] in
                 guard let base = base else { return }
                 if shouldShow {
-                    base.loaderViewHeightConstraint?.update(offset: 50)
+                    base.tableView.tableFooterView = base.loaderView
                     base.loader.startAnimating()
                 } else {
-                    base.loaderViewHeightConstraint?.update(offset: 0)
+                    base.tableView.tableFooterView = nil
                     base.loader.stopAnimating()
                 }
             }
@@ -136,7 +132,7 @@ extension InfiniteTableViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if indexPath.row == tableView.numberOfRows(inSection: indexPath.section) - 1 {
-            viewModel?.loadMoreData.accept(Void())
+            viewModel?.loadMoreData.accept(indexPath.row)
         }
     }
 }

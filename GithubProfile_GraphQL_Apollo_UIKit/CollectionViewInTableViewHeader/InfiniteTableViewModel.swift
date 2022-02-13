@@ -12,7 +12,7 @@ import RxSwift
 final class InfiniteTableViewModel: InfiniteTableViewModelBindable {
     // input
     let viewDidLoad = PublishRelay<Void>()
-    let loadMoreData = PublishRelay<Void>()
+    let loadMoreData = PublishRelay<LastRowIndex>()
     
     // output
     let reloadTableView: Driver<[String]>
@@ -21,17 +21,21 @@ final class InfiniteTableViewModel: InfiniteTableViewModelBindable {
     static let tableViewInitialDataSource: [String] = ["AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA"]
     
     init() {
+        let loadMoreWhenDistinct = loadMoreData
+            .distinctUntilChanged()
+            .share()
+
         let loadedSignal = Observable<Void>
             .merge(
                 viewDidLoad.asObservable(),
-                loadMoreData.asObservable()
+                loadMoreWhenDistinct.map { _ in Void() }
             )
             .delay(.seconds(2), scheduler: ConcurrentMainScheduler.instance)
             .share()
         
         self.shouldShowLoadView = Observable
             .merge(
-                loadMoreData.map { _ in true },
+                loadMoreWhenDistinct.map { _ in true },
                 loadedSignal.map { _ in false }
             )
             .asDriver(onErrorJustReturn: true)
