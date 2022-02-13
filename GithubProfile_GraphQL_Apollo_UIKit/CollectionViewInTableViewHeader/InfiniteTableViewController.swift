@@ -14,8 +14,9 @@ import SnapKit
 // STEP1. TableView에 String Data 40개를 뿌린다. <DONE>
 // STEP2. TableView에 마지막에 닿았을 때, 데이터를 추가생성하는 시그널을 호출한다. <DONE>
 // STEP3. TableView에 마지막에 닿았을 때, 나타나는 로더뷰를 생성한다. <DONE>
-// STEP4. Footer로 넣기 (Footer로 지정할 경우 높이를 컨트롤하는 것이 불가) <DONE>
+// STEP4. 로더뷰 Footer로 넣기 <DONE>
 // STEP5. 위로 올라갔다가, 다시 내려왔을 때 현재 data가 돌고 있다면, skip되어야한다. <DONE>
+// STEP6. Performance를 위해 DiffableDataSource를 이용해보자 <DONE>
 
 typealias LastRowIndex = Int
 protocol InfiniteTableViewModelBindable {
@@ -23,8 +24,12 @@ protocol InfiniteTableViewModelBindable {
     var viewDidLoad: PublishRelay<Void> { get }
     var loadMoreData: PublishRelay<LastRowIndex> { get }
     // output
-    var reloadTableView: Driver<[String]> { get }
+    var reloadTableView: Driver<[Item]> { get }
     var shouldShowLoadView: Driver<Bool> { get }
+}
+
+enum Section: String {
+    case main
 }
 
 final class InfiniteTableViewController: UIViewController {
@@ -35,7 +40,7 @@ final class InfiniteTableViewController: UIViewController {
     let disposeBag = DisposeBag()
 
     // viewData
-    var tableViewDataSource: [String]? = []
+    var tableViewDataSource: UITableViewDiffableDataSource<Section, Item>?
     var viewModel: InfiniteTableViewModelBindable?
     
     init() {
@@ -43,7 +48,12 @@ final class InfiniteTableViewController: UIViewController {
         
         tableView.register(InfiniteTableViewCell.self, forCellReuseIdentifier: "InfiniteTableViewCell")
         tableView.delegate = self
-        tableView.dataSource = self
+        
+        tableViewDataSource = UITableViewDiffableDataSource<Section, Item>(tableView: self.tableView, cellProvider: { tableView, indexPath, item in
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: "InfiniteTableViewCell") as? InfiniteTableViewCell else { return UITableViewCell() }
+            cell.configure(text: item.text)
+            return cell
+        })
     }
     
     func bind(viewModel: InfiniteTableViewModelBindable) {
@@ -81,10 +91,18 @@ final class InfiniteTableViewController: UIViewController {
 }
 
 extension Reactive where Base: InfiniteTableViewController {
-    var reloadTableView: Binder<[String]> {
-        return Binder(base) { base, data in
-            base.tableViewDataSource?.append(contentsOf: data)
-            base.tableView.reloadData()
+    var reloadTableView: Binder<[Item]> {
+        return Binder(base) { base, items in
+            guard var dataSourceSnapShot = base.tableViewDataSource?.snapshot() else { return }
+            if dataSourceSnapShot.sectionIdentifiers.contains(where: { section in
+                return section == .main
+            }) {
+                dataSourceSnapShot.appendItems(items, toSection: .main)
+            } else {
+                dataSourceSnapShot.appendSections([.main])
+                dataSourceSnapShot.appendItems(items, toSection: .main)
+            }
+            base.tableViewDataSource?.apply(dataSourceSnapShot)
         }
     }
     
@@ -107,27 +125,6 @@ extension Reactive where Base: InfiniteTableViewController {
 extension InfiniteTableViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, estimatedHeightForFooterInSection section: Int) -> CGFloat {
         return 0
-    }
-}
-
-extension InfiniteTableViewController: UITableViewDataSource {
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return tableViewDataSource?.count ?? 0
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "InfiniteTableViewCell") as? InfiniteTableViewCell else { return UITableViewCell() }
-        
-        guard let data = tableViewDataSource?[indexPath.row] else {
-            return UITableViewCell() }
-    
-        cell.configure(text: data)
-        
-        return cell
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {

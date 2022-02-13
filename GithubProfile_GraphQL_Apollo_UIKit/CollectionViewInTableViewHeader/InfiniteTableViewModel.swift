@@ -33,7 +33,7 @@ final class InfiniteTableViewModel: InfiniteTableViewModelBindable {
                 viewDidLoad.asObservable(),
                 loadMoreWhenDistinct.map { _ in Void() }
             )
-            .delay(.seconds(2), scheduler: ConcurrentMainScheduler.instance)
+            .delay(.seconds(2), scheduler: ConcurrentMainScheduler.instance) // 서버에서 동작하는 것처럼 꾸미기
             .share()
         
         self.shouldShowLoadView = Observable
